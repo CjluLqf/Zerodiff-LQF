@@ -6,7 +6,7 @@ Created on Sun Sep 29 17:52:45 2019
 """
 import os
 os.system('''CUDA_VISIBLE_DEVICES=5 OMP_NUM_THREADS=3  python zerodiff_DFG_train.py \
---dataroot /Data_PHD_Backup/phd22_zihan_ye/datasets/xlsa17/data \
+--dataroot ./Dataset \
 --dataset SUN --image_embedding res101 --class_embedding att --class_embedding_norm --eval_interval 5 \
 --gzsl --manualSeed 4115 --encoded_noise --preprocessing --cuda \
 --nepoch 400 --ngh 4096 --ndh 4096 --lr 0.0001 --classifier_lr 0.0005 --lambda1 10 --critic_iter 5 \

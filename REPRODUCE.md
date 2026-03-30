@@ -1,59 +1,23 @@
 # ZeroDiff 最简复现实验指南
 
-本文档固定使用项目内路径，避免把数据和输出写到其他目录。
+本文档按当前实验设置固定使用 `att` 语义嵌入，不再使用 `sent`。
 
-## 1. 已创建的最小目录
+## 1. ce_ce.mat 和 con_paco.mat 的具体作用
 
-在项目根目录 [pytorch/lqf/Zerodiff-LQF](pytorch/lqf/Zerodiff-LQF) 下：
+读取逻辑见 [pytorch/lqf/Zerodiff-LQF/datasets/image_util.py](pytorch/lqf/Zerodiff-LQF/datasets/image_util.py)。
 
-- [pytorch/lqf/Zerodiff-LQF/Dataset](pytorch/lqf/Zerodiff-LQF/Dataset)
-- [pytorch/lqf/Zerodiff-LQF/Dataset/AWA2](pytorch/lqf/Zerodiff-LQF/Dataset/AWA2)
-- [pytorch/lqf/Zerodiff-LQF/Dataset/CUB](pytorch/lqf/Zerodiff-LQF/Dataset/CUB)
-- [pytorch/lqf/Zerodiff-LQF/Dataset/SUN](pytorch/lqf/Zerodiff-LQF/Dataset/SUN)
-- [pytorch/lqf/Zerodiff-LQF/log](pytorch/lqf/Zerodiff-LQF/log)
-- [pytorch/lqf/Zerodiff-LQF/out](pytorch/lqf/Zerodiff-LQF/out)
+- `ce_ce.mat`：主视觉特征输入。
+	- 在数据加载阶段，`ce_ce.mat` 的 `features` 会作为 `train_feature / test_seen_feature / test_unseen_feature`。
+	- 这些特征直接送入生成器与判别器相关训练流程，是 DRG/DFG 的核心视觉表征。
+- `con_paco.mat`：对比表示分支输入。
+	- 其 `features` 会被读成 `train_paco / test_seen_paco / test_unseen_paco`。
+	- 该分支用于提供对比学习语义相关的辅助特征，与主视觉特征联合约束生成质量与泛化。
 
-## 2. .mat 文件放置位置
+这两个 `.mat` 都必须包含键：`features`。
 
-数据读取逻辑在 [pytorch/lqf/Zerodiff-LQF/datasets/image_util.py](pytorch/lqf/Zerodiff-LQF/datasets/image_util.py)。
-训练时建议统一使用参数：--dataroot ./Dataset。
+## 2. 数据完整性一键检查
 
-三个数据集都按下面路径放置：
-
-- AWA2: [pytorch/lqf/Zerodiff-LQF/Dataset/AWA2](pytorch/lqf/Zerodiff-LQF/Dataset/AWA2)
-- CUB: [pytorch/lqf/Zerodiff-LQF/Dataset/CUB](pytorch/lqf/Zerodiff-LQF/Dataset/CUB)
-- SUN: [pytorch/lqf/Zerodiff-LQF/Dataset/SUN](pytorch/lqf/Zerodiff-LQF/Dataset/SUN)
-
-每个数据集目录最少需要：
-
-- res101.mat
-- ce_ce.mat
-- con_paco.mat
-- att_splits.mat 或 sent_splits.mat（二选一，取决于 --class_embedding）
-
-若做低比例实验（--split_percent 为 10 或 30），额外放：
-
-- split_10percent.mat
-- split_30percent.mat
-
-`ce_ce.mat` 和 `con_paco.mat` 说明：
-
-- 这两个文件都是特征文件，训练代码会直接读取其中的 `features` 键。
-- 优先从官方 README 的 fine-tuned features 网盘下载后放入对应数据集目录。
-- 若你想自行生成，可使用：
-	- [pytorch/lqf/Zerodiff-LQF/FineTune/PACO/extract_features_ce_ce.py](pytorch/lqf/Zerodiff-LQF/FineTune/PACO/extract_features_ce_ce.py)
-	- [pytorch/lqf/Zerodiff-LQF/FineTune/PACO/extract_features_con_paco.py](pytorch/lqf/Zerodiff-LQF/FineTune/PACO/extract_features_con_paco.py)
-	其中第二个脚本默认输出名是 `ce_paco.mat`，使用前需要改名为 `con_paco.mat`。
-
-## 3.1 数据完整性一键检查
-
-在项目根目录执行：
-
-```bash
-bash scripts/check_dataset_mats.sh --dataroot ./Dataset --class-embedding sent
-```
-
-如果你使用 `--class_embedding att` 训练，请改为：
+在项目根目录执行（固定 att）：
 
 ```bash
 bash scripts/check_dataset_mats.sh --dataroot ./Dataset --class-embedding att
@@ -62,10 +26,10 @@ bash scripts/check_dataset_mats.sh --dataroot ./Dataset --class-embedding att
 如果还要检查低比例实验所需文件：
 
 ```bash
-bash scripts/check_dataset_mats.sh --dataroot ./Dataset --class-embedding sent --check-split
+bash scripts/check_dataset_mats.sh --dataroot ./Dataset --class-embedding att --check-split
 ```
 
-## 4. 最简运行方式（Linux）
+## 3. 最简运行方式（Linux）
 
 必须在项目根目录运行，避免相对路径偏移：
 
@@ -76,14 +40,14 @@ cd /home/st/pytorch/lqf/Zerodiff-LQF
 先运行 DRG，再运行 DFG。示例（以 CUB 为例）：
 
 ```bash
-python zerodiff_DRG_train.py --dataset CUB --dataroot ./Dataset --class_embedding sent --gzsl --cuda
+python zerodiff_DRG_train.py --dataset CUB --dataroot ./Dataset --class_embedding att --gzsl --cuda
 ```
 
 ```bash
-python zerodiff_DFG_train.py --dataset CUB --dataroot ./Dataset --class_embedding sent --gzsl --cuda --netR_model_path <DRG生成的tar路径>
+python zerodiff_DFG_train.py --dataset CUB --dataroot ./Dataset --class_embedding att --gzsl --cuda --netR_model_path <DRG生成的tar路径>
 ```
 
-## 5. 输出位置
+## 4. 输出位置
 
 - 日志目录： [pytorch/lqf/Zerodiff-LQF/log](pytorch/lqf/Zerodiff-LQF/log)
 - 权重目录： [pytorch/lqf/Zerodiff-LQF/out](pytorch/lqf/Zerodiff-LQF/out)

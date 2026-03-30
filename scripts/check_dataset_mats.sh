@@ -2,16 +2,16 @@
 set -euo pipefail
 
 DATAROOT="./Dataset"
-CLASS_EMBEDDING="sent"
+CLASS_EMBEDDING="att"
 CHECK_SPLIT="false"
 
 usage() {
   cat <<'EOF'
-Usage: bash scripts/check_dataset_mats.sh [--dataroot PATH] [--class-embedding att|sent] [--check-split]
+Usage: bash scripts/check_dataset_mats.sh [--dataroot PATH] [--class-embedding att] [--check-split]
 
 Options:
   --dataroot PATH          Dataset root directory (default: ./Dataset)
-  --class-embedding TYPE   att or sent (default: sent)
+  --class-embedding TYPE   att only (default: att)
   --check-split            Also require split_10percent.mat and split_30percent.mat
 EOF
 }
@@ -42,8 +42,8 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ "$CLASS_EMBEDDING" != "att" && "$CLASS_EMBEDDING" != "sent" ]]; then
-  echo "Error: --class-embedding must be att or sent." >&2
+if [[ "$CLASS_EMBEDDING" != "att" ]]; then
+  echo "Error: this project is fixed to att, use --class-embedding att." >&2
   exit 2
 fi
 
