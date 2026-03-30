@@ -4,7 +4,7 @@
 @author: ZihanYe
 """
 import os
-os.system('''CUDA_VISIBLE_DEVICES=5 OMP_NUM_THREADS=4 python zerodiff_DRG_train.py \
+os.system('''CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=4 python zerodiff_DRG_train.py \
 --gzsl --encoded_noise --manualSeed 9182 --preprocessing --cuda --image_embedding res101 \
 --class_embedding att --class_embedding_norm --nepoch 300 --ngh 4096 --ndh 4096 --lambda1 10 --critic_iter 5 \
 --nclass_all 50 --dataroot ./Dataset --dataset AWA2 \

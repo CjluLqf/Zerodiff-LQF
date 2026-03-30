@@ -5,7 +5,7 @@ Created on Sun Sep 29 17:52:45 2019
 @author: akshita
 """
 import os
-os.system('''CUDA_VISIBLE_DEVICES=5 OMP_NUM_THREADS=3 python zerodiff_DFG_train.py \
+os.system('''CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=3 python zerodiff_DFG_train.py \
 --gzsl --encoded_noise --manualSeed 3483 --preprocessing --cuda --image_embedding res101 \
 --class_embedding att --nepoch 300 --ngh 4096 --ndh 4096  --lambda1 10 --critic_iter 5 \
 --nclass_all 200 --dataroot ./Dataset --dataset CUB --eval_interval 5 \

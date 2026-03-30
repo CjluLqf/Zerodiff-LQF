@@ -2,6 +2,50 @@
 
 本文档按当前实验设置固定使用 `att` 语义嵌入，不再使用 `sent`。
 
+## 0. 服务器信息与环境准备
+
+### 0.1 服务器信息
+
+- GPU: RTX 5090
+- Driver: 580.126.09
+- System CUDA: 13.0
+
+说明：推荐对齐到已验证可用组合：PyTorch 2.9.1+cu130。
+
+### 0.2 创建虚拟环境（名称固定：zerodiff）
+
+```bash
+conda create -n zerodiff python=3.10 -y
+conda activate zerodiff
+python -m pip install --upgrade pip
+```
+
+### 0.3 安装 PyTorch（cu130）
+
+```bash
+pip install torch==2.9.1+cu130 torchvision==0.24.1+cu130 torchaudio==2.9.1+cu130 --index-url https://download.pytorch.org/whl/cu130
+```
+
+### 0.4 安装实验依赖
+
+```bash
+pip install scikit-learn==1.3.0 scipy==1.10.0 numpy==1.24.3 pillow==9.4.0
+```
+
+### 0.5 验证环境
+
+```bash
+python -c "import torch; print('torch=', torch.__version__); print('cuda=', torch.version.cuda); print('cuda_available=', torch.cuda.is_available()); print('gpu=', torch.cuda.get_device_name(0))"
+```
+
+### 0.6 单卡运行约定
+
+本机单卡训练统一使用：
+
+```bash
+export CUDA_VISIBLE_DEVICES=0
+```
+
 ## 1. ce_ce.mat 和 con_paco.mat 的具体作用
 
 读取逻辑见 [pytorch/lqf/Zerodiff-LQF/datasets/image_util.py](pytorch/lqf/Zerodiff-LQF/datasets/image_util.py)。

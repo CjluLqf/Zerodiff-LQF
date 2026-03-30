@@ -5,7 +5,7 @@ Created on Sun Sep 29 17:52:45 2019
 @author: akshita
 """
 import os
-os.system('''CUDA_VISIBLE_DEVICES=5 OMP_NUM_THREADS=3  python zerodiff_DRG_train.py \
+os.system('''CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=3  python zerodiff_DRG_train.py \
 --dataroot ./Dataset \
 --dataset SUN --image_embedding res101 --class_embedding att --class_embedding_norm --eval_interval 5 \
 --gzsl --manualSeed 4115 --encoded_noise --preprocessing --cuda \
