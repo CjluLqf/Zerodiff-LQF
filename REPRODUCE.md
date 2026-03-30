@@ -1,72 +1,91 @@
-# ZeroDiff 复现实验指南
+# ZeroDiff 最简复现实验指南
 
-本文档给出该仓库在 CUB 数据集上的推荐复现流程，并说明参数入口与数据文件要求。
+本文档固定使用项目内路径，避免把数据和输出写到其他目录。
 
-## 1. 参数配置在哪里
+## 1. 已创建的最小目录
 
-- 全部默认参数定义在 [config_zerodiff.py](config_zerodiff.py)。
-- 每个数据集的推荐参数模板在 [scripts](scripts) 目录：
-  - [scripts/run_cub_zerodiff_DRG_train.py](scripts/run_cub_zerodiff_DRG_train.py)
-  - [scripts/run_cub_zerodiff_DFG_train.py](scripts/run_cub_zerodiff_DFG_train.py)
-  - [scripts/run_awa2_zerodiff_DRG_train.py](scripts/run_awa2_zerodiff_DRG_train.py)
-  - [scripts/run_awa2_zerodiff_DFG_train.py](scripts/run_awa2_zerodiff_DFG_train.py)
-  - [scripts/run_sun_zerodiff_DRG_train.py](scripts/run_sun_zerodiff_DRG_train.py)
-  - [scripts/run_sun_zerodiff_DFG_train.py](scripts/run_sun_zerodiff_DFG_train.py)
+在项目根目录 [pytorch/lqf/Zerodiff-LQF](pytorch/lqf/Zerodiff-LQF) 下：
 
-说明：脚本参数会覆盖默认参数。
+- [pytorch/lqf/Zerodiff-LQF/Dataset](pytorch/lqf/Zerodiff-LQF/Dataset)
+- [pytorch/lqf/Zerodiff-LQF/Dataset/AWA2](pytorch/lqf/Zerodiff-LQF/Dataset/AWA2)
+- [pytorch/lqf/Zerodiff-LQF/Dataset/CUB](pytorch/lqf/Zerodiff-LQF/Dataset/CUB)
+- [pytorch/lqf/Zerodiff-LQF/Dataset/SUN](pytorch/lqf/Zerodiff-LQF/Dataset/SUN)
+- [pytorch/lqf/Zerodiff-LQF/log](pytorch/lqf/Zerodiff-LQF/log)
+- [pytorch/lqf/Zerodiff-LQF/out](pytorch/lqf/Zerodiff-LQF/out)
 
-## 2. CUB 训练流程（先 DRG 再 DFG）
+## 2. .mat 文件放置位置
 
-建议在仓库根目录执行，并先创建输出目录：
+数据读取逻辑在 [pytorch/lqf/Zerodiff-LQF/datasets/image_util.py](pytorch/lqf/Zerodiff-LQF/datasets/image_util.py)。
+训练时建议统一使用参数：--dataroot ./Dataset。
 
-```powershell
-New-Item -ItemType Directory -Force -Path .\log\CUB | Out-Null
-New-Item -ItemType Directory -Force -Path .\out\CUB | Out-Null
+三个数据集都按下面路径放置：
+
+- AWA2: [pytorch/lqf/Zerodiff-LQF/Dataset/AWA2](pytorch/lqf/Zerodiff-LQF/Dataset/AWA2)
+- CUB: [pytorch/lqf/Zerodiff-LQF/Dataset/CUB](pytorch/lqf/Zerodiff-LQF/Dataset/CUB)
+- SUN: [pytorch/lqf/Zerodiff-LQF/Dataset/SUN](pytorch/lqf/Zerodiff-LQF/Dataset/SUN)
+
+每个数据集目录最少需要：
+
+- res101.mat
+- ce_ce.mat
+- con_paco.mat
+- att_splits.mat 或 sent_splits.mat（二选一，取决于 --class_embedding）
+
+若做低比例实验（--split_percent 为 10 或 30），额外放：
+
+- split_10percent.mat
+- split_30percent.mat
+
+`ce_ce.mat` 和 `con_paco.mat` 说明：
+
+- 这两个文件都是特征文件，训练代码会直接读取其中的 `features` 键。
+- 优先从官方 README 的 fine-tuned features 网盘下载后放入对应数据集目录。
+- 若你想自行生成，可使用：
+	- [pytorch/lqf/Zerodiff-LQF/FineTune/PACO/extract_features_ce_ce.py](pytorch/lqf/Zerodiff-LQF/FineTune/PACO/extract_features_ce_ce.py)
+	- [pytorch/lqf/Zerodiff-LQF/FineTune/PACO/extract_features_con_paco.py](pytorch/lqf/Zerodiff-LQF/FineTune/PACO/extract_features_con_paco.py)
+	其中第二个脚本默认输出名是 `ce_paco.mat`，使用前需要改名为 `con_paco.mat`。
+
+## 3.1 数据完整性一键检查
+
+在项目根目录执行：
+
+```bash
+bash scripts/check_dataset_mats.sh --dataroot ./Dataset --class-embedding sent
 ```
 
-### 第一步：训练 DRG
+如果你使用 `--class_embedding att` 训练，请改为：
 
-```powershell
-python .\zerodiff_DRG_train.py --dataset CUB --gzsl --manualSeed 3483 --image_embedding res101 --class_embedding sent --eval_interval 1 --encoded_noise --preprocessing --cuda --nepoch 300 --ngh 4096 --ndh 4096 --lr 0.0001 --classifier_lr 0.001 --lambda1 10 --critic_iter 5 --dataroot YOUR_XLSA17_DATA_ROOT --nclass_all 200 --noiseSize 1024 --attSize 1024 --resSize 2048 --gamma_ADV 1 --gamma_VAE 0.0 --embed_type VA --gamma_recons 1.0 --n_T 4 --dim_t 1024 --gamma_x0 1.0 --gamma_xt 1.0 --gamma_dist 1.0 --batch_size 64 --syn_num 300 --split_percent 100
+```bash
+bash scripts/check_dataset_mats.sh --dataroot ./Dataset --class-embedding att
 ```
 
-### 第二步：训练 DFG
+如果还要检查低比例实验所需文件：
 
-将下面命令中的 `YOUR_NETR_TAR_PATH` 替换成上一步输出的 DRG 模型路径：
-
-```powershell
-python .\zerodiff_DFG_train.py --gzsl --encoded_noise --manualSeed 3483 --preprocessing --cuda --image_embedding res101 --class_embedding sent --nepoch 300 --ngh 4096 --ndh 4096 --lambda1 10 --critic_iter 5 --nclass_all 200 --dataroot YOUR_XLSA17_DATA_ROOT --dataset CUB --eval_interval 5 --batch_size 64 --noiseSize 1024 --attSize 1024 --resSize 2048 --lr 0.0001 --classifier_lr 0.001 --gamma_recons 0.01 --dec_lr 0.0001 --gamma_ADV 10 --gamma_VAE 1.0 --embed_type VA --n_T 4 --dim_t 1024 --gamma_x0 1.0 --gamma_xt 1.0 --gamma_dist 2.0 --factor_dist 1.5 --split_percent 100 --syn_num 1440 --netR_model_path YOUR_NETR_TAR_PATH
+```bash
+bash scripts/check_dataset_mats.sh --dataroot ./Dataset --class-embedding sent --check-split
 ```
 
-## 3. 需要准备/上传的数据文件
+## 4. 最简运行方式（Linux）
 
-数据读取逻辑见 [datasets/image_util.py](datasets/image_util.py)。
+必须在项目根目录运行，避免相对路径偏移：
 
-设 `--dataroot` 为 `D:/Dataset/xlsa17/data` 时，目录应为：
+```bash
+cd /home/st/pytorch/lqf/Zerodiff-LQF
+```
 
-- `D:/Dataset/xlsa17/data/CUB/`
-- `D:/Dataset/xlsa17/data/AWA2/`
-- `D:/Dataset/xlsa17/data/SUN/`
+先运行 DRG，再运行 DFG。示例（以 CUB 为例）：
 
-每个数据集目录下必需文件：
+```bash
+python zerodiff_DRG_train.py --dataset CUB --dataroot ./Dataset --class_embedding sent --gzsl --cuda
+```
 
-- `res101.mat`
-- `<class_embedding>_splits.mat`
-- `ce_ce.mat`
-- `con_paco.mat`
+```bash
+python zerodiff_DFG_train.py --dataset CUB --dataroot ./Dataset --class_embedding sent --gzsl --cuda --netR_model_path <DRG生成的tar路径>
+```
 
-其中 `<class_embedding>_splits.mat` 取决于参数：
+## 5. 输出位置
 
-- `--class_embedding att` 时为 `att_splits.mat`
-- `--class_embedding sent` 时为 `sent_splits.mat`
+- 日志目录： [pytorch/lqf/Zerodiff-LQF/log](pytorch/lqf/Zerodiff-LQF/log)
+- 权重目录： [pytorch/lqf/Zerodiff-LQF/out](pytorch/lqf/Zerodiff-LQF/out)
 
-若做小样本比例实验（`--split_percent` 为 10 或 30），还需要：
-
-- `split_10percent.mat`
-- `split_30percent.mat`
-
-## 4. 运行结果检查
-
-- 日志输出在 `log/<dataset>/`。
-- 模型权重在 `out/<dataset>/`。
-- DRG 阶段应先产出一个可被 DFG 阶段读取的 `*_gzsl.tar` 文件。
+说明：DRG 阶段脚本依赖这两个目录已存在，因此已提前创建。

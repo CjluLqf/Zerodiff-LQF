@@ -24,3 +24,6 @@ Thumbs.db
 # Local datasets (recommended to keep out of Git)
 Dataset/
 data/
+
+# Local planning notes
+plan.md
