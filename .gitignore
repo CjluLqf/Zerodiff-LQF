@@ -1,0 +1,26 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Training outputs and runtime artifacts
+log/
+out/
+*.log
+*.tar
+
+# Editor / OS files
+.DS_Store
+Thumbs.db
+
+# Local datasets (recommended to keep out of Git)
+Dataset/
+data/
