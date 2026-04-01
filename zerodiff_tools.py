@@ -249,7 +249,7 @@ class DRG_Discriminator_ct(nn.Module):
         self.dim_t = opt.dim_t
         self.time_embed = TimeEmbedFC(self.dim_t, opt.attSize)
 
-        self.fc1 = nn.Linear(self.dim_v+self.dim_v + opt.attSize + self.dim_t, opt.ndh)
+        self.fc1 = nn.Linear(self.dim_v + self.dim_v + opt.attSize + opt.attSize, opt.ndh)
         self.fc2 = nn.Linear(opt.ndh, 1)
         self.lrelu = nn.LeakyReLU(0.2)
 
@@ -293,7 +293,7 @@ class DFG_Discriminator_xt(nn.Module):
         self.time_embed = TimeEmbedFC(self.dim_t, opt.attSize)
         self.con_emb_layers = TimeEmbedFC(2048, opt.attSize)
 
-        self.fc1 = nn.Linear(self.dim_v+self.dim_v + opt.attSize + opt.attSize + self.dim_t, opt.ndh)
+        self.fc1 = nn.Linear(self.dim_v + self.dim_v + opt.attSize + opt.attSize + opt.attSize, opt.ndh)
         self.fc2 = nn.Linear(opt.ndh, 1)
         self.lrelu = nn.LeakyReLU(0.2)
 
