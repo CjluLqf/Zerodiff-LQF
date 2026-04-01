@@ -10,7 +10,7 @@ os.system('''CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=3 python zerodiff_DRG_train.
  --encoded_noise --preprocessing --cuda \
 --nepoch 300 --ngh 4096 --ndh 4096 --lr 0.0001 --classifier_lr 0.001 --lambda1 10 --critic_iter 5 \
 --dataroot ./Dataset \
---nclass_all 200 --noiseSize 1024 --attSize 1024 --resSize 2048 \
+--nclass_all 200 --noiseSize 1024 --attSize 312 --resSize 2048 \
 --gamma_ADV 1 --gamma_VAE 0.0 --embed_type VA --gamma_recons 1.0 \
 --n_T 4 --dim_t 1024 --gamma_x0 1.0 --gamma_xt 1.0 --gamma_dist 1.0 \
 --batch_size 64 --syn_num 300 --split_percent 100 \

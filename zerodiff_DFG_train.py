@@ -55,6 +55,11 @@ if torch.cuda.is_available() and not opt.cuda:
     print("WARNING: You have a CUDA device, so you should probably run with --cuda")
 # load data
 data = util.DATA_LOADER(opt)
+actual_att_size = data.attribute.size(1)
+if opt.attSize != actual_att_size:
+    print(f"WARNING: overriding --attSize from {opt.attSize} to dataset attribute size {actual_att_size}")
+    opt.attSize = actual_att_size
+    opt.latent_size = opt.attSize
 print("# of training samples: ", data.ntrain)
 
 ###########

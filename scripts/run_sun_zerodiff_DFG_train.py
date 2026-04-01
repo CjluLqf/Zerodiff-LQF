@@ -15,17 +15,17 @@ os.system('''CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=3  python zerodiff_DFG_train
 --gamma_ADV 1 --gamma_VAE 1.0 --embed_type VA \
 --n_T 4 --dim_t 102 --gamma_x0 1.0 --gamma_xt 1.0 --gamma_dist 1.0 --factor_dist 1.5 \
 --split_percent 100 --syn_num 400 \
---netR_model_path ./out/SUN/diffzero_pretrain_100percent_att:att_b:64_lr:0.0001_n_T:4_betas:0.1,20_gamma:ADV:1.0_VAE:1.0_x0:1.0_xt:1.0_dist:0.0_num:400_gzsl.tar
+--netR_model_path ./out/SUN/DRG_best_gzsl.tar
 ''')
 
 # split_percent 100:
 # --split_percent 100 --syn_num 400 \
-# --netR_model_path ./out/SUN/diffzero_pretrain_100percent_att:att_b:64_lr:0.0001_n_T:4_betas:0.1,20_gamma:ADV:1.0_VAE:1.0_x0:1.0_xt:1.0_dist:0.0_num:400_gzsl.tar
+# --netR_model_path ./out/SUN/DRG_best_gzsl.tar
 
 # split_percent 30:
 # --split_percent 30 --syn_num 120 \
-# --netR_model_path ./out/SUN/diffzero_pretrain_30percent_att:att_b:64_lr:0.0001_n_T:4_betas:0.1,20_gamma:ADV:1.0_VAE:1.0_x0:1.0_xt:1.0_dist:0.0_num:120_gzsl.tar
+# --netR_model_path ./out/SUN/DRG_best_gzsl.tar
 
 # split_percent 10:
 # --split_percent 10 --syn_num 40 \
-# --netR_model_path ./out/SUN/diffzero_pretrain_10percent_att:att_b:64_lr:0.0001_n_T:4_betas:0.1,20_gamma:ADV:1.0_VAE:1.0_x0:1.0_xt:1.0_dist:0.0_num:40_gzsl.tar
+# --netR_model_path ./out/SUN/DRG_best_gzsl.tar
