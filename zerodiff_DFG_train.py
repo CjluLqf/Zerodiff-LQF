@@ -205,7 +205,7 @@ class ZERODIFF(torch.nn.Module):
 
         self.netR = zerodiff_tools.DRG_Generator(opt).to(self.device)
         netR_state_dict = torch.load(netR_model_path)
-        self.netR.load_state_dict(netR_state_dict['state_dict_G_con'])
+        self.netR.load_state_dict(netR_state_dict['state_dict_R'])
         self.netR.eval()
 
         self.interval_recorder_sum = {}
