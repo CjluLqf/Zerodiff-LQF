@@ -521,7 +521,7 @@ for epoch in range(0, opt.nepoch):
     print(log_record)
     logger.write(log_record + '\n')
 
-    criticD_train_real_x0 = ZERODIFF.interval_recorder_sum['criticD_train_real_x0'].item() / n_iter
+    criticD_train_real_x0 = zerodiff.interval_recorder_sum['criticD_train_real_x0'].item() / n_iter
     criticD_train_real_xt = zerodiff.interval_recorder_sum['criticD_train_real_xt'].item() / n_iter
     criticD_train_real_xc = zerodiff.interval_recorder_sum['criticD_train_real_xc'].item() / n_iter
 
