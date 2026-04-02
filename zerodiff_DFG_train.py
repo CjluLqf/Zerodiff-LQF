@@ -402,7 +402,7 @@ class ZERODIFF(torch.nn.Module):
 
             if progressive:
                 for i in reversed(range(self.n_T)):
-                    _ts = torch.full((n_sample,), i, dtype=torch.int64).to(x_t.device)
+                    _ts = torch.full((n_sample,), i, dtype=torch.int64).to(x_tp1.device)
                     x_0_pred = self.netG(z, att, r_0_fake, x_tp1, _ts)
                     x_t = self.sample_posterior(x_0_pred, x_tp1, _ts.long())
                     x_tp1 = x_t.detach()
